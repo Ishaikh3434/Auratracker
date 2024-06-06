@@ -96,3 +96,30 @@ class Command(commands.Cog):
             db.commit()
             cursor.close()
             db.close()
+
+    @commands.hybrid_command(name="leaderboard",description="Check the swag rankings!")
+    async def Leaderboard(self,ctx):
+        db=sqlite3.connect("/auratracker/main.sqlite")
+        cursor=db.cursor()
+        query = 'SELECT user_id,swag FROM main ORDER BY swag DESC'  
+        cursor.execute(query)
+
+        user_ids = cursor.fetchall()
+
+        cursor.close()
+        db.close()
+        
+        embed=discord.Embed(title='Swag Leaderboard', description="Who's the swaggiest?")
+        i=0
+        for user in user_ids:
+            username=ctx.bot.get_user(int(user[0])).display_name
+            if i==0:
+                pastestring=f"👑 {username} 👑: {str(user[1])}"
+            else:
+                pastestring=f"{i+1} - {username}: {str(user[1])}"
+            embed.add_field(name=pastestring, value='', inline=False)
+            i+=1
+        await ctx.send(content="Leaderboard", embed=embed)
+        
+        
+

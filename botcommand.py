@@ -23,7 +23,7 @@ class Command(commands.Cog):
     async def myswag(self,ctx,member:discord.Member = None):
         if member is None:
             member = ctx.author
-        db= sqlite3.connect(f"main.sqlite")
+        db= sqlite3.connect(f"/auratracker/main.sqlite")
         cursor = db.cursor()
 
         cursor.execute(f"SELECT swag FROM main WHERE user_id = {member.id}")
@@ -43,10 +43,10 @@ class Command(commands.Cog):
         message = await channel.fetch_message(reaction.message_id)
     
     
-        db= sqlite3.connect(f"main.sqlite")
+        db= sqlite3.connect(f"/auratracker/main.sqlite")
         cursor = db.cursor()
         author=message.author
-        if reaction.emoji.name=="🔥" and reaction.member.id != author.id:
+        if reaction.emoji.name=="🔥": #and reaction.member.id != author.id:
             
             cursor.execute(f"SELECT swag FROM main WHERE user_id={author.id}")
             wallet=cursor.fetchone()
@@ -73,7 +73,7 @@ class Command(commands.Cog):
         message = await channel.fetch_message(reaction.message_id)
     
     
-        db= sqlite3.connect(f"main.sqlite")
+        db= sqlite3.connect(f"/auratracker/main.sqlite")
         cursor = db.cursor()
         author=message.author
         if reaction.emoji.name=="🔥":

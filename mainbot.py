@@ -2,7 +2,7 @@ import asyncio
 import os
 import discord
 from botevent import Event # type: ignore
-from botcommand import Command
+from botcommand import Command # type: ignore
 from discord import Embed, app_commands
 from discord.ext import commands
 import sqlite3
@@ -34,4 +34,4 @@ async def on_ready():
 
 
 # Run the bot with your token
-bot.run(os.getenv('TOKEN'))
+bot.run('')

@@ -35,3 +35,4 @@ async def on_ready():
 
 # Run the bot with your token
 bot.run('')
+#bot.run(os.getenv('TOKEN'))

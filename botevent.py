@@ -16,7 +16,7 @@ class Event(commands.Cog):
         db = sqlite3.connect(f"/auratracker/main.sqlite")
         cursor=db.cursor()
         cursor.execute(f'''CREATE TABLE IF NOT EXISTS main (
-                       user_id INTEGER, swag INTEGER
+                       user_id INTEGER, swag INTEGER, guild_id INTEGER
         )''')
         
        
@@ -27,13 +27,14 @@ class Event(commands.Cog):
             return
       
         author = message.author
+        print(message.guild.id)
         db = sqlite3.connect(f"/auratracker/main.sqlite")
         cursor=db.cursor()
-        cursor.execute(f"SELECT user_id FROM main WHERE user_id = {author.id}")
+        cursor.execute(f"SELECT user_id FROM main WHERE user_id = {author.id} AND guild_id = {message.guild.id}")
         result=cursor.fetchone()
         if result is  None:
-            sql = (f"INSERT INTO main(user_id,swag) VALUES (?,?)")
-            val = (author.id, 0)
+            sql = (f"INSERT INTO main(user_id,swag,guild_id) VALUES (?,?,?)")
+            val = (author.id, 0, message.guild.id)
             cursor.execute(sql,val)
 
         db.commit()

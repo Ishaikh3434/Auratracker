@@ -11,7 +11,7 @@ class Command(commands.Cog):
         self.bot = bot
 
     
-
+    
 
     @commands.hybrid_command(name="ping", description="pong")
     async def ping(self, ctx):
@@ -46,13 +46,16 @@ class Command(commands.Cog):
         db= sqlite3.connect(f"/auratracker/main.sqlite")
         cursor = db.cursor()
         author=message.author
-        if reaction.emoji.name=="🔥": #and reaction.member.id != author.id:
-            
+        if reaction.emoji.name=="🔥" and reaction.member.id != author.id:
             cursor.execute(f"SELECT swag FROM main WHERE user_id={author.id}")
             wallet=cursor.fetchone()
             sql = (f"UPDATE main SET swag = ? WHERE user_id = ?")
             val = (wallet[0] + int(100), author.id)
             cursor.execute(sql, val)
+            db.commit()
+            sql = (f"UPDATE main SET swag = ? WHERE user_id = ?")
+            val = (wallet[0] + int(10), reaction.member.id)
+            cursor.execute(sql, val)            
             db.commit()
             cursor.close()
             db.close()
@@ -62,6 +65,10 @@ class Command(commands.Cog):
             wallet=cursor.fetchone()
             sql = (f"UPDATE main SET swag = ? WHERE user_id = ?")
             val = (wallet[0] + int(-100), author.id)
+            cursor.execute(sql, val)
+            db.commit()
+            sql = (f"UPDATE main SET swag = ? WHERE user_id = ?")
+            val = (wallet[0] + int(-20), reaction.member.id)
             cursor.execute(sql, val)
             db.commit()
             cursor.close()
@@ -101,7 +108,7 @@ class Command(commands.Cog):
     async def Leaderboard(self,ctx):
         db=sqlite3.connect("/auratracker/main.sqlite")
         cursor=db.cursor()
-        query = 'SELECT user_id,swag FROM main ORDER BY swag DESC'  
+        query = f'SELECT user_id,swag FROM main WHERE guild_id = {ctx.message.guild.id} ORDER BY swag DESC'  
         cursor.execute(query)
 
         user_ids = cursor.fetchall()
@@ -121,5 +128,5 @@ class Command(commands.Cog):
             i+=1
         await ctx.send(content="Leaderboard", embed=embed)
         
-        
+    
 

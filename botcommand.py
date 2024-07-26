@@ -4,6 +4,7 @@ import os
 from discord import Embed, app_commands
 from discord.ext import commands
 import sqlite3
+import random as rd
 
 class Command(commands.Cog):
     
@@ -135,6 +136,34 @@ class Command(commands.Cog):
             embed.add_field(name=pastestring, value='', inline=False)
             i+=1
         await ctx.send(content="Leaderboard", embed=embed)
-        
-    
+
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        author=message.author
+        bot=self.bot
+        if message.author.bot:
+            return
+        if rd.randint(0,100) == 50:
+            reaction_emoji='🔮'
+            await message.add_reaction(reaction_emoji)
+            def check(reaction, recipient):
+                return recipient == message.author and str(reaction.emoji) == reaction_emoji and reaction.message == message 
+            try:
+                db= sqlite3.connect(f"/auratracker/main.sqlite")
+                cursor = db.cursor()
+                reaction, _ = await self.bot.wait_for('reaction_add', timeout=3.0, check=check)
+                await message.remove_reaction(reaction_emoji,author)
+                await message.remove_reaction(reaction_emoji,bot.user) 
+                cursor.execute(f"SELECT swag FROM main WHERE user_id={author.id}")
+                wallet=cursor.fetchone()
+                sql = (f"UPDATE main SET swag = ? WHERE user_id = ?")
+                val = (wallet[0] + int(100), author.id)
+                cursor.execute(sql, val)
+                db.commit()
+                cursor.close()
+                db.close()
+
+            except asyncio.TimeoutError:
+                await message.remove_reaction(reaction_emoji,author)
+                await message.remove_reaction(reaction_emoji,bot.user)        
 

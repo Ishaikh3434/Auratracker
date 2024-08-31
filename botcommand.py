@@ -128,7 +128,10 @@ class Command(commands.Cog):
         embed=discord.Embed(title='Swag Leaderboard', description="Who's the swaggiest?")
         i=0
         for user in user_ids:
-            username=ctx.bot.get_user(int(user[0])).display_name
+            try:
+                username=ctx.bot.get_user(int(user[0])).display_name
+            except:
+                username="Removed User"
             if i==0:
                 pastestring=f"👑 {username} 👑: {str(user[1])}"
             else:

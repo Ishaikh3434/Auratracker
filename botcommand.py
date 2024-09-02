@@ -13,9 +13,10 @@ class Command(commands.Cog):
 
     
     global swagup,swagdown
+    global swagalias
     swagup="🔥"
     swagdown="🤓"
-
+    swagalias="Swag"
 
     @commands.hybrid_command(name="ping", description="pong")
     async def ping(self, ctx):
@@ -23,8 +24,14 @@ class Command(commands.Cog):
         latency = self.bot.latency * 1000
         await ctx.send(f"Pong! Latency: {latency:.2f} ms")
     
-    @commands.hybrid_command(name="myswag", description="Check your swag")
-    async def myswag(self,ctx,member:discord.Member = None):
+    @commands.hybrid_command(name="pointsname", description="Change the name of the points tracked by the bot! Purely cosmetic.")
+    async def pointsname(self,ctx,name):
+        global swagalias
+        swagalias=name
+        await ctx.send(f"Now tracking {swagalias} points!")
+    
+    @commands.hybrid_command(name="mypoints", description=f"Check your points!")
+    async def mypoints(self,ctx,member:discord.Member = None):
         if member is None:
             member = ctx.author
         db= sqlite3.connect(f"/auratracker/main.sqlite")
@@ -37,16 +44,16 @@ class Command(commands.Cog):
         except:
             swag=0
         
-        await ctx.send(f"{member} has {swag} Swag points.")
+        await ctx.send(f"{member} has {swag} {swagalias} points.")
         cursor.close()
         db.close()
     
     @commands.hybrid_command(name="changereaction",description="Change the reactions the bot will grant/remove points for. Inputs must be emoji.")
-    async def changereaction(self,ctx,emoteup=None,emotedown=None):
+    async def changereaction(self,ctx,emoteup:discord.Emoji=None,emotedown:discord.Emoji=None):
         global swagup,swagdown
         swagup,swagdown=emoteup,emotedown
         
-        await ctx.send(f'You now gain swag when you get "{swagup}"-reacted, and lose points when you get "{swagdown}"-reacted!')
+        await ctx.send(f'You now gain {swagalias} when you get "{swagup}"-reacted, and lose {swagalias} when you get "{swagdown}"-reacted!')
 
 
     @commands.Cog.listener()
@@ -124,7 +131,7 @@ class Command(commands.Cog):
             cursor.close()
             db.close()
 
-    @commands.hybrid_command(name="leaderboard",description="Check the swag rankings!")
+    @commands.hybrid_command(name="leaderboard",description=f"Check the rankings!")
     async def Leaderboard(self,ctx):
         db=sqlite3.connect("/auratracker/main.sqlite")
         cursor=db.cursor()
@@ -136,7 +143,7 @@ class Command(commands.Cog):
         cursor.close()
         db.close()
         
-        embed=discord.Embed(title='Swag Leaderboard', description="Who's the swaggiest?")
+        embed=discord.Embed(title=f'{swagalias} Leaderboard', description="Who's winning?")
         i=0
         for user in user_ids:
             try:

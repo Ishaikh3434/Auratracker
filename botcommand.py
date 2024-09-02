@@ -12,7 +12,10 @@ class Command(commands.Cog):
         self.bot = bot
 
     
-    
+    global swagup,swagdown
+    swagup="🔥"
+    swagdown="🤓"
+
 
     @commands.hybrid_command(name="ping", description="pong")
     async def ping(self, ctx):
@@ -37,6 +40,14 @@ class Command(commands.Cog):
         await ctx.send(f"{member} has {swag} Swag points.")
         cursor.close()
         db.close()
+    
+    @commands.hybrid_command(name="changereaction",description="Change the reactions the bot will grant/remove points for. Inputs must be emoji.")
+    async def changereaction(self,ctx,emoteup=None,emotedown=None):
+        global swagup,swagdown
+        swagup,swagdown=emoteup,emotedown
+        
+        await ctx.send(f'You now gain swag when you get "{swagup}"-reacted, and lose points when you get "{swagdown}"-reacted!')
+
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, reaction):
@@ -47,7 +58,7 @@ class Command(commands.Cog):
         db= sqlite3.connect(f"/auratracker/main.sqlite")
         cursor = db.cursor()
         author=message.author
-        if reaction.emoji.name=="🔥" and reaction.member.id != author.id:
+        if reaction.emoji.name==swagup and reaction.member.id != author.id:
             cursor.execute(f"SELECT swag FROM main WHERE user_id={author.id}")
             wallet=cursor.fetchone()
             sql = (f"UPDATE main SET swag = ? WHERE user_id = ?")
@@ -61,7 +72,7 @@ class Command(commands.Cog):
             cursor.close()
             db.close()
             
-        if reaction.emoji.name=="🤓" and reaction.member.id != author.id:
+        if reaction.emoji.name==swagdown and reaction.member.id != author.id:
             cursor.execute(f"SELECT swag FROM main WHERE user_id={author.id}")
             wallet=cursor.fetchone()
             sql = (f"UPDATE main SET swag = ? WHERE user_id = ?")
@@ -84,7 +95,7 @@ class Command(commands.Cog):
         db= sqlite3.connect(f"/auratracker/main.sqlite")
         cursor = db.cursor()
         author=message.author
-        if reaction.emoji.name=="🔥":
+        if reaction.emoji.name==swagup:
             
             cursor.execute(f"SELECT swag FROM main WHERE user_id={author.id}")
             wallet=cursor.fetchone()
@@ -99,7 +110,7 @@ class Command(commands.Cog):
             cursor.close()
             db.close()
             
-        if reaction.emoji.name=="🤓":
+        if reaction.emoji.name==swagdown:
             cursor.execute(f"SELECT swag FROM main WHERE user_id={author.id}")
             wallet=cursor.fetchone()
             sql = (f"UPDATE main SET swag = ? WHERE user_id = ?")
